@@ -7,7 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BEEC2FDA27BBA89900B8C271 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = BEEC2FD927BBA89900B8C271 /* main.c */; };
+		BE20744427BC32DD00342ECB /* Sq-Matrix.c in Sources */ = {isa = PBXBuildFile; fileRef = BE20744327BC32DD00342ECB /* Sq-Matrix.c */; };
+		BE20744527BC41C300342ECB /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = BEEC2FD927BBA89900B8C271 /* main.c */; };
+		BECD173E27BF9C2F0066B812 /* RingInfo.c in Sources */ = {isa = PBXBuildFile; fileRef = BECD173D27BF9C2F0066B812 /* RingInfo.c */; };
+		BEEFF1E727C002CC00A42AEB /* Menu.c in Sources */ = {isa = PBXBuildFile; fileRef = BEEFF1E627C002CC00A42AEB /* Menu.c */; };
+		BEEFF1EA27C17EA000A42AEB /* console.c in Sources */ = {isa = PBXBuildFile; fileRef = BEEFF1E927C17EA000A42AEB /* console.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,8 +27,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BE20744227BC32DD00342ECB /* Sq-Matrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Sq-Matrix.h"; sourceTree = "<group>"; };
+		BE20744327BC32DD00342ECB /* Sq-Matrix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "Sq-Matrix.c"; sourceTree = "<group>"; };
+		BECD173C27BF9C2F0066B812 /* RingInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RingInfo.h; sourceTree = "<group>"; };
+		BECD173D27BF9C2F0066B812 /* RingInfo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RingInfo.c; sourceTree = "<group>"; };
 		BEEC2FD627BBA89900B8C271 /* lab1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lab1; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEEC2FD927BBA89900B8C271 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		BEEFF1E527C002CC00A42AEB /* Menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Menu.h; sourceTree = "<group>"; };
+		BEEFF1E627C002CC00A42AEB /* Menu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Menu.c; sourceTree = "<group>"; };
+		BEEFF1E827C17EA000A42AEB /* console.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
+		BEEFF1E927C17EA000A42AEB /* console.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = console.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +70,14 @@
 			isa = PBXGroup;
 			children = (
 				BEEC2FD927BBA89900B8C271 /* main.c */,
+				BE20744227BC32DD00342ECB /* Sq-Matrix.h */,
+				BE20744327BC32DD00342ECB /* Sq-Matrix.c */,
+				BECD173C27BF9C2F0066B812 /* RingInfo.h */,
+				BECD173D27BF9C2F0066B812 /* RingInfo.c */,
+				BEEFF1E527C002CC00A42AEB /* Menu.h */,
+				BEEFF1E627C002CC00A42AEB /* Menu.c */,
+				BEEFF1E827C17EA000A42AEB /* console.h */,
+				BEEFF1E927C17EA000A42AEB /* console.c */,
 			);
 			path = lab1;
 			sourceTree = "<group>";
@@ -119,7 +139,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEEC2FDA27BBA89900B8C271 /* main.c in Sources */,
+				BEEFF1E727C002CC00A42AEB /* Menu.c in Sources */,
+				BE20744527BC41C300342ECB /* main.c in Sources */,
+				BECD173E27BF9C2F0066B812 /* RingInfo.c in Sources */,
+				BEEFF1EA27C17EA000A42AEB /* console.c in Sources */,
+				BE20744427BC32DD00342ECB /* Sq-Matrix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
