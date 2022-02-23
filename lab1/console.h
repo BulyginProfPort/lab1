@@ -16,6 +16,5 @@ struct Matrix;
 void choose_size(int *size);
 void printM(struct Matrix* m );
 int checkM(struct Matrix* matrix);
-void freeM(struct Matrix *matrix);
 
 #endif /* console_h */

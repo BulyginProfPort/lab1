@@ -4,7 +4,8 @@
 #include <time.h>
 struct Matrix{
     struct RingInfo* ringInfo;
-    int mSize;
+    int rows;
+    int columns;
     int **a;
 };
 
@@ -13,27 +14,41 @@ struct Matrix* getMyStruct(struct Matrix* matrix){
     matrix->a = NULL;
     return matrix;
 }
-
+void freeMyStruct(struct Matrix* matrix){
+    for (int i = 0; i < matrix->rows - 1; i++){
+        free(matrix->a[i]);
+    }
+    free(matrix->a);
+    free(matrix);
+}
+void freeMyMatrix(struct Matrix* matrix){
+    for (int i = 0; i < matrix->rows; i++){
+        free(matrix->a[i]);
+    }
+    free(matrix->a);
+}
 // 1. Создание
 
-void Zeroes(struct Matrix* matrix,struct RingInfo* ringInfo,int size){
-    matrix->mSize = size;
-    matrix->a = malloc ( matrix->mSize * sizeof(int*));
-    for ( int i = 0; i < size; i++ ){
-        matrix->a[i] = (int*)malloc( matrix->mSize * sizeof(int) );
-        for ( int j = 0; j < size; j++ ){
+void Zeroes(struct Matrix* matrix,struct RingInfo* ringInfo,int rows, int columns){
+    matrix->rows = rows;
+    matrix->columns = columns;
+    matrix->a = malloc ( matrix->rows * sizeof(int*));
+    for ( int i = 0; i < matrix->rows; i++ ){
+        matrix->a[i] = (int*)malloc( matrix->columns * sizeof(int) );
+        for ( int j = 0; j < matrix->columns; j++ ){
             matrix->a[i][j] = 0;
             }
         }
 }
 
-void Identity_Matrix(struct Matrix* matrix,struct RingInfo* ringInfo,int size){
-    matrix->mSize = size;
-    matrix->a = malloc ( matrix->mSize * sizeof(int*));
-    for (int i=0;i<size;i++){
-        matrix->a[i] = malloc( matrix->mSize * sizeof(int));
-        for (int j=0; j<size; j++){
-            if (i!=j){
+void Identity_Matrix(struct Matrix* matrix,struct RingInfo* ringInfo,int rows, int columns){
+    matrix->rows = rows;
+    matrix->columns = columns;
+    matrix->a = malloc ( matrix->rows * sizeof(int*));
+    for (int i=0;i < matrix->rows;i++){
+        matrix->a[i] = malloc( matrix->columns * sizeof(int));
+        for (int j = 0; j < matrix->columns; j++){
+            if (i != j){
                 matrix->a[i][j] = 0;
             }
             else{
@@ -43,23 +58,25 @@ void Identity_Matrix(struct Matrix* matrix,struct RingInfo* ringInfo,int size){
     }
 }
 
-void AnyValue_Matrix(struct Matrix* matrix,struct RingInfo* ringInfo,int value, int size){
-    matrix->mSize = size;
-    matrix->a = malloc ( matrix->mSize * sizeof(int*));
-    for (int i = 0; i < matrix->mSize; i++){
-        matrix->a[i] = malloc( matrix->mSize * sizeof(int));
-        for (int j = 0; j < matrix->mSize; j++){
+void AnyValue_Matrix(struct Matrix* matrix,struct RingInfo* ringInfo,int value, int rows, int columns){
+    matrix->rows = rows;
+    matrix->columns = columns;
+    matrix->a = malloc ( matrix->rows * sizeof(int*));
+    for (int i = 0; i < matrix->rows; i++){
+        matrix->a[i] = malloc( matrix->columns * sizeof(int));
+        for (int j = 0; j < matrix->columns; j++){
             matrix->a[i][j] = value;
         }
     }
 }
 
-void randvv(struct Matrix* matrix,int size){
-    matrix->mSize = size;
-    matrix->a = malloc ( matrix->mSize * sizeof(int*));
-    for ( int i = 0; i < matrix->mSize; i++ ){
-        matrix->a[i] = (int*) malloc( matrix->mSize * sizeof(int) );
-        for ( int j = 0; j < matrix->mSize; j++ ){
+void randvv(struct Matrix* matrix,int rows, int columns){
+    matrix->rows = rows;
+    matrix->columns = columns;
+    matrix->a = malloc ( matrix->rows * sizeof(int*));
+    for ( int i = 0; i < matrix->columns; i++ ){
+        matrix->a[i] = malloc( matrix->columns * sizeof(int) );
+        for ( int j = 0; j < matrix->columns; j++ ){
             matrix->a[i][j]=(rand()%9)+1;
         }
     }
@@ -68,25 +85,30 @@ void randvv(struct Matrix* matrix,int size){
 // 2. Декомпозиция
 
 struct Matrix* GetColumn(struct Matrix* result,struct Matrix* matrix, int num_column){
-    for ( int i = 0; i < matrix->mSize; i++){
-        for (int j = 0 ; j < matrix->mSize; j++){
-            result->a[i][num_column] = matrix->a[i][num_column];
-        }
+    result->a = malloc( matrix->rows * sizeof(int*) );
+    result->rows = matrix->rows;
+    result->columns = 1;
+    for ( int i = 0; i < matrix->columns; i++){
+        result->a[i] = malloc( sizeof(int) );
+        result->a[i][0] = matrix->a[i][num_column-1];
     }
     return result;
 }
 
-struct Matrix* GetLine(struct Matrix* result,struct Matrix* matrix, int num_line){
-    result->mSize = matrix->mSize;
-    for ( int j=0; j < matrix->mSize; j++){
-        result->a[0][j] = matrix->a[num_line][j];
+struct Matrix* GetLine(struct Matrix* result,struct Matrix* matrix, int num_rows){
+    result->rows = 1;
+    result->columns = matrix->columns;
+    result->a = malloc( sizeof(int*) );
+    result->a[0] = malloc( matrix->columns * sizeof(int) );
+    for ( int j = 0; j < matrix->columns; j++){
+        result->a[0][j] = matrix->a[num_rows-1][j];
     }
     return result;
 }
 
 void transposedMatrix(struct Matrix *matrix){
     int t=0;
-    for (int i = 0; i < matrix->mSize; i++){
+    for (int i = 0; i < matrix->rows; i++){
         for (int j = 0; j < i; j++){
             t = matrix->a[i][j];
             matrix->a[i][j] = matrix->a[j][i];
@@ -98,116 +120,137 @@ void transposedMatrix(struct Matrix *matrix){
 
 void getMinor(struct Matrix* matrix, struct Matrix* new_matrix, int line, int col){
     int markerl = 0, markercol = 0;
-    for  (int i = 0; i < new_matrix->mSize; i++){
+    for  (int i = 0; i < new_matrix->rows; i++){
         if (i == line){
             markerl = 1;
         }
         markercol = 0;
-        for (int j = 0; j < new_matrix->mSize; j++){
+        for (int j = 0; j < new_matrix->columns; j++){
             if (j == col){
                 markercol = 1;
             }
             new_matrix->a[i][j] = matrix->a[i+markerl][j+markercol];
         }
     }
+
 }
 
 int getDet(struct Matrix* matrix){
     int det = 0, sign = 1;
-    if (matrix->mSize < 1){
-        
-    }
-    else if (matrix->mSize == 1){
-        return (matrix->a[0][0]);
-    }
-    else if (matrix->mSize == 2){
-        return (matrix->a[0][0] * matrix->a[1][1] - matrix->a[0][1] * matrix->a[1][0]);
-    }
-    else{
-        struct Matrix* newMatrix = malloc(sizeof(struct Matrix));
-        newMatrix->mSize = matrix->mSize - 1;
-        newMatrix->a = malloc( newMatrix->mSize * sizeof(int*) );
-        for(int i = 0; i < matrix->mSize; i++) {
-            newMatrix->a[i] = malloc( newMatrix->mSize * sizeof(int) );
+    if (matrix->columns == matrix->rows){
+        if ( (matrix->rows < 1)){
+            printf("Ошибка! Дана неправильная матрица. Попробуйте создать матрицу.\n");
+        }
+        else if (matrix->rows == 1){
+            return (matrix->a[0][0]);
+        }
+        else if (matrix->rows == 2){
+            return (matrix->a[0][0] * matrix->a[1][1] - matrix->a[0][1] * matrix->a[1][0]);
+        }
+        else{
+            struct Matrix* newMatrix = malloc(sizeof(struct Matrix));
+            newMatrix->rows = matrix->rows - 1;
+            newMatrix->columns = matrix->columns - 1;
+            
+            newMatrix->a = malloc( newMatrix->rows * sizeof(int*) );
+            for(int i = 0; i < newMatrix->rows; i++) {
+                newMatrix->a[i] = malloc( newMatrix->rows * sizeof(int) );
+            }
+            for(int j = 0; j < matrix->rows; j++){
+                getMinor(matrix,newMatrix, 0, j);
+                det = det + (sign * matrix->a[0][j] * getDet(newMatrix) );
+                sign = -sign;
+            }
+            freeMyStruct(newMatrix);
         }
         
-        for(int j = 0; j < matrix->mSize; j++){
-            getMinor(matrix,newMatrix, 0, j);
-            det = det + (sign * matrix->a[0][j] * getDet(newMatrix) );
-            sign = -sign;
-        }
-
-        for(int i = 0; i < matrix->mSize-1; i++) {
-            free(newMatrix->a[i]);
-        }
-        free(newMatrix->a);
-        free(newMatrix);
     }
     return det;
 }
 
 void inverseMatrix(struct Matrix *matrix, struct Matrix *result){
     int sign = 1;
-    result->mSize = matrix->mSize;
-    struct Matrix* newMatrix = malloc(sizeof(struct Matrix));
-    newMatrix->mSize = matrix->mSize - 1;
-    newMatrix->a = malloc( newMatrix->mSize * sizeof(int*));
-    printM(matrix);
-    for (int i = 0; i < newMatrix->mSize; i++){
-        newMatrix->a[i] = malloc( newMatrix->mSize * sizeof(int));
-    }
-    result->a = malloc(matrix->mSize * sizeof(int*));
-    for (int i = 0; i < matrix->mSize; i++){
-        result->a[i] = malloc(matrix->mSize * sizeof(int));
-        for (int j = 0; j < matrix->mSize; j++){
-            getMinor(matrix,newMatrix, i, j);
-            result->a[i][j] = sign * getDet(newMatrix);
-            sign = -sign;
+    
+    if (matrix->columns == matrix->rows){
+        
+        struct Matrix* newMatrix = malloc(sizeof(struct Matrix));
+        newMatrix->rows = matrix->rows - 1;
+        newMatrix->columns =matrix->columns - 1;
+        newMatrix->a = malloc( newMatrix->rows * sizeof(int*));
+        
+        for (int i = 0; i < newMatrix->rows; i++){
+            newMatrix->a[i] = malloc( newMatrix->rows * sizeof(int));
         }
+        result->a = malloc(matrix->rows * sizeof(int*));
+        result->rows = matrix->rows;
+        result->columns = matrix->columns;
+        
+        for (int i = 0; i < matrix->rows; i++){
+            result->a[i] = malloc(matrix->rows * sizeof(int));
+            for (int j = 0; j < matrix->columns; j++){
+                getMinor(matrix,newMatrix, i, j);
+                result->a[i][j] = sign * getDet(newMatrix);
+                sign = -sign;
+            }
+        }
+        transposedMatrix(result);
+        freeMyStruct(newMatrix);
     }
-    transposedMatrix(result);
-    for(int i = 0; i < newMatrix->mSize; i++) {
-        free(newMatrix->a[i]);
-    }
-    free(newMatrix->a);
-    free(newMatrix);
 }
 
 
 // 3. Операции
-
-struct Matrix* Sum(struct Matrix* result,struct Matrix* m1, struct Matrix* m2){
+struct Matrix* Sum(struct Matrix* result,struct Matrix* matrix1, struct Matrix* matrix2){
     //struct Matrix* result = malloc(sizeof(struct Matrix));
-    if (m1->mSize == m2->mSize){
-        for (int i = 0; i < m1->mSize; i++){
-            result->a[i] = malloc( m1->mSize * sizeof(int*));
-            for (int j=0; j < m1->mSize; i++ ){
-                result->a[i][j] = m1->a[i][j] + m2->a[i][j];
+    if (matrix1->columns == matrix1->rows || matrix2->columns == matrix2->rows){
+        if (matrix1->rows == matrix2->rows){
+            for (int i = 0; i < matrix1->rows; i++){
+                result->a[i] = malloc( matrix1->rows * sizeof(int*));
+                for (int j=0; j < matrix1->columns; i++ ){
+                    result->a[i][j] = matrix1->a[i][j] + matrix2->a[i][j];
+                }
             }
         }
     }
     return result;
 }
-struct Matrix* MultSc(int scalar, struct Matrix* m){
-    for (int i = 0; i < m->mSize; i++){
-        m->a[i] = malloc (m->mSize * sizeof(int*));
-        for (int j = 0; j < m->mSize; j++){
-            m->a[i][j] = m->a[i][j] * scalar;
+
+void MultSc (int scalar, struct Matrix* matrix){
+    if (matrix->columns == matrix->rows){
+        for (int i = 0; i < matrix->rows; i++){
+            for (int j = 0; j < matrix->columns; j++){
+                matrix->a[i][j] = matrix->a[i][j] * scalar;
+            }
         }
     }
-    return m;
 }
 
-struct Matrix* Mult(struct Matrix* result, struct Matrix* m1, struct Matrix* m2){
+struct Matrix* Mult(struct Matrix* result, struct Matrix* matrix1, struct Matrix* matrix2){
     //struct Matrix* result = malloc(sizeof(struct Matrix));
-    for (int i = 0; i < m1->mSize; i++){
-        result->a[i] = malloc( m1->mSize * sizeof(int*));
-        for (int j = 0; j < m1->mSize; j++){
-            result->a[i][j] += m1->a[i][j] * m2->a[j][i];
+    if (matrix1->columns == matrix2->rows){
+        for (int i = 0; i < matrix1->rows; i++){
+            result->a[i] = malloc( matrix1->rows * sizeof(int*));
+            for (int j = 0; j < matrix1->columns; j++){
+                result->a[i][j] += matrix1->a[i][j] * matrix2->a[j][i];
+            }
         }
     }
     return result;
 }
 
-
-//struct Matrix* SumLinComb(void* scalar, struct Matrix* m, int numLine){}
+struct Matrix* SumLinComb(void* scalar, struct Matrix* matrix, int numLine){
+    struct Matrix* template;
+    template = malloc( sizeof(struct Matrix*) );
+    if (matrix->columns == matrix->rows){
+        template->a = malloc( matrix->rows * sizeof(int*) );
+        for (int i = 0; i < matrix->rows; i++){
+            template->a[i] = malloc( matrix->rows * sizeof(int) );
+        }
+        for (int i = 0; i < matrix->rows; i++){
+            for (int j = 0; j < matrix->columns; j++){
+                template->a[i][j] = matrix->a[i][j];
+            }
+        }
+    }
+    return matrix;
+}

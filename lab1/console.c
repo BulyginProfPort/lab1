@@ -4,7 +4,8 @@
 #include <stdlib.h>
 struct Matrix{
     struct RingInfo* ringInfo;
-    int mSize;
+    int rows;
+    int columns;
     int **a;
 };
 void choose_size(int *size) //Функция для проверки правильного введенного значение размера матрицы
@@ -21,8 +22,8 @@ void choose_size(int *size) //Функция для проверки прави�
 
 void printM(struct Matrix *matrix){
     printf("\nМАТРИЦА\n");
-    for (int i = 0; i < matrix->mSize ; i++){
-        for ( int j = 0; j< matrix->mSize; j++){
+    for (int i = 0; i < matrix->rows ; i++){
+        for ( int j = 0; j< matrix->columns; j++){
             printf("%d ",matrix->a[i][j]);
         }
         printf("\n");
@@ -31,17 +32,13 @@ void printM(struct Matrix *matrix){
 }
 
 int checkM(struct Matrix *matrix){ // Проверка на пустоту матрицы (была ли она инициализирована, былали ли выделена память под неё). Так же можно проверять чисто по размеру (если size = 0), но скорее всего она может быть инициализирована, просо путая
-    if ( matrix->a == NULL ){
+    if (matrix == NULL){
+        return 0;
+    }
+    else if ( matrix->a == NULL ){
         return 0;
     }
     else{
         return 1; // Матрица была инцициалзирована, под неё была выделена память.
     }
-}
-
-void freeM(struct Matrix *matrix){
-    for (int i = 0; i < matrix->mSize; i++){
-        free(matrix->a[i]);
-    }
-    free(matrix->a);
 }
