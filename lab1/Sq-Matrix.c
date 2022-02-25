@@ -15,7 +15,7 @@ struct Matrix* getMyStruct(struct Matrix* matrix){
     return matrix;
 }
 void freeMyStruct(struct Matrix* matrix){
-    for (int i = 0; i < matrix->rows - 1; i++){
+    for (int i = 0; i < matrix->rows; i++){
         free(matrix->a[i]);
     }
     free(matrix->a);
