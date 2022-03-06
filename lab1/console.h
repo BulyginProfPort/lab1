@@ -13,8 +13,12 @@
 #include "RingInfo.h"
 
 struct Matrix;
-void choose_size(int *size);
+void choose_size(struct Matrix* matrix);
 void printM(struct Matrix* m );
 int checkM(struct Matrix* matrix);
+int checkMultSc(int a, struct Matrix* matrix);
+int checkLinColNum(int type,int num, struct Matrix* matrix);
+void selectedType(struct Matrix* matrix);
+
 
 #endif /* console_h */

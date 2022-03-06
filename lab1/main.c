@@ -5,26 +5,22 @@
 #include "console.h"
 #include <time.h>
 
+#define printName(a)((printf("Какой тип чиселв в %s вы хотите использовать?\n1.Целочисленные.\n2.Вещественные.\n",#a)))
+
 int main(){
     srand(time(NULL));
-    
-    int selected = 0, size = 0, det = 0, scalar = 0, choose = 0;
-    
+    int* tempi = NULL;
+    double* tempd  = NULL;
+    int selected = 0,chsc = 0, size = 0;
+    void* scalar = NULL;
+    void* det = NULL;
     struct Matrix* matrix1 = NULL;
     struct Matrix* matrix2 = NULL;
     struct Matrix* result = NULL;
-    struct RingInfo* ringInfo = NULL;
-    
+
     matrix1 = getMyStruct(matrix1);
     result = getMyStruct(result);
-    
-    ringInfo = malloc(sizeof(struct RingInfo));
-    
-    printf("Какой тип чисел вы хотите использовать?\n"
-           "1. Целочисленные числа\n"
-           "2. Вещественные числа\n");
-    scanf("%d",&choose);
-    
+
 A:  printf("1. Создать матрицу.\n"
            "2. Операции над матрицой\n"
            "3. Операции над матрицами\n"
@@ -42,42 +38,35 @@ A:  printf("1. Создать матрицу.\n"
             scanf("%d",&select1);
             while (select1 < 5){
                 if (select1 == 1){
-                    if ( checkM(matrix1) == 1){
-                        freeMyMatrix(matrix1);
-                    }
+                    freeMyMatrix(matrix1);
                     size = 0;
-                    choose_size(&size); 
-                    Zeroes(matrix1, ringInfo, size, size);
+                    printName(matrix1);
+                    Zeroes(matrix1);
+                    
                     printM(matrix1);
                     goto A;
                 }
                 if (select1 == 2){
-                    if ( checkM(matrix1) == 1){
-                        freeMyMatrix(matrix1);
-                    }
-                    choose_size(&size);
-                    Identity_Matrix(matrix1, ringInfo, size, size);
+                    freeMyMatrix(matrix1);
+                    printName(matrix1);
+                    Identity_Matrix(matrix1);
+
                     printM(matrix1);
                     goto A;
                 }
                 if (select1 == 3){
-                    if ( checkM(matrix1) == 1){
-                        freeMyMatrix(matrix1);
-                    }
-                    choose_size(&size);
-                    randvv(matrix1,size,size);
+                    freeMyMatrix(matrix1);
+                    printName(matrix1);
+                    randvv(matrix1);
+                    
                     printM(matrix1);
                     goto A;
                 }
                 if (select1 == 4){
-                    int value;
-                    if ( checkM(matrix1) == 1){
-                        freeMyMatrix(matrix1);
-                    }
-                    choose_size(&size);
-                    printf("Введите число, из которого хотите создать матрицу.\n");
-                    scanf("%d",&value);
-                    AnyValue_Matrix(matrix1, ringInfo, value, size,size);
+                    freeMyMatrix(matrix1);
+                    printName(matrix1);
+                    AnyValue_Matrix(matrix1);
+                    
                     printM(matrix1);
                     goto A;
                 }
@@ -103,8 +92,12 @@ A:  printf("1. Создать матрицу.\n"
                         printf("Ошибка! Дана пустая матрица. Попробуйте создать матрицу.\n");
                         goto A;
                     }
-                    det = getDet(matrix1);
-                    printf("det = %d\n",det);
+                    
+                    det = malloc(sizeof(void*));
+                    tempd = malloc(sizeof(void*));
+                    tempi = malloc(sizeof(void*));
+                    
+                    getDet(matrix1,tempi,tempd);
                     goto A;
                 }
                 if (select2 == 2){
@@ -130,10 +123,26 @@ A:  printf("1. Создать матрицу.\n"
                         printf("Ошибка! Дана пустая матрица. Попробуйте создать матрицу.\n");
                         goto A;
                     }
-                    printf("Введите число (скаляр): ");
-                    scanf("%d",&scalar);
+                    printf("Пожалуйста, ведите тип числа, которого хотите умножить на матрицу.\n1. Целое число.\n2. Вещественное число.\n");
+                    scanf("%d",&chsc);
+                    while(chsc > 2 || chsc < 0 || checkMultSc(chsc, matrix1) != 1){
+                        printf("Введено некорректное значение, попробуйте ещё раз.\n");
+                        scanf("%d",&chsc);
+                        getchar();
+                    }
+                    scalar = malloc(sizeof(void*));
+                    
+                    if (chsc == 1){
+                        printf("Введите число (скаляр): ");
+                        scanf("%d",(int*)scalar);
+                    }
+                    else if(chsc ==  2){
+                        printf("Введите число (скаляр): ");
+                        scanf("%lf",(double*)scalar);
+                    }
                     MultSc(scalar, matrix1);
                     printM(matrix1);
+                    free(scalar);
                     goto A;
                 }
                 if (select2 == 5){
@@ -147,12 +156,16 @@ A:  printf("1. Создать матрицу.\n"
                     freeMyStruct(result);
                     result = getMyStruct(result);
                     
-                    int line = 0;
+                    int row = 0;
                     
                     printf("Введите номер строки, которой хотите получить: ");
-                    scanf("%d",&line);
-                    
-                    GetLine(result, matrix1, line);
+                    scanf("%d",&row);
+                    while( checkLinColNum(1, row, matrix1) != 0 ){
+                        printf("Введен номер несуществующей строки, попробуйте ещё раз: ");
+                        scanf("%d",&row);
+                        getchar();
+                    }
+                    GetLine(result, matrix1, row);
                     
                     printM(result);
                     goto A;
@@ -167,9 +180,13 @@ A:  printf("1. Создать матрицу.\n"
                     
                     int column = 0;
                     
-                    printf("Введите номер строки, которой хотите получить: ");
+                    printf("Введите номер столбца, которой хотите получить: ");
                     scanf("%d",&column);
-                    
+                    while(checkLinColNum(2, column, matrix1) != 0){
+                        printf("Введен номер несущетвующего столбца, попробуйте ещё раз: ");
+                        scanf("%d",&column);
+                        getchar();
+                    }
                     GetColumn(result, matrix1, column);
                     
                     printM(result);
@@ -179,52 +196,36 @@ A:  printf("1. Создать матрицу.\n"
             goto A;
         }
         if (selected == 3){
-            if ( (checkM(matrix1) == 1) && (checkM(matrix2) == 1) ){
-                
-            }
             int select3 = 0;
-            printf("Какую операцию вы хотите произвести?\n"
-                   "1. Сумма матриц.\n"
-                   "2. Произведение матриц.\n"
-                   "3. Exit.\n");
-            scanf("%d",&select3);
-            while (select3 < 3){
-                if (select3 == 1){
-                    Sum(result, matrix1, matrix2);
-                    printM(result);
-                    goto A;
-                }
-                if (select3 == 2){
-                    Mult(result, matrix1, matrix2);
-                    printM(result);
-                    goto A;
+            if ( (checkM(matrix1) == 1) && (checkM(matrix2) == 1) ){
+                printf("Какую операцию вы хотите произвести?\n"
+                       "1. Сумма матриц.\n"
+                       "2. Произведение матриц.\n"
+                       "3. Exit.\n");
+                scanf("%d",&select3);
+                while (select3 < 3){
+                    if (select3 == 1){
+                        Sum(result, matrix1, matrix2);
+                        printM(result);
+                        goto A;
+                    }
+                    if (select3 == 2){
+                        Mult(result, matrix1, matrix2);
+                        printM(result);
+                        goto A;
+                    }
                 }
             }
-            goto A;
+            else{
+                printf("Ошибка! 2 матрица не задана, задайте 2-ую матрицу.\n");
+                
+                goto A;
+            }
         }
     }
-    
-    if (checkM(matrix1) != 0 ){
-        freeMyStruct(matrix1);
-    }
-    else if (matrix1 != NULL || checkM(matrix1) == 0){
-        free(matrix1);
-    }
-    
-    if (checkM(matrix2) != 0 ){
-        freeMyStruct(matrix2);
-    }
-    else if (matrix2 != NULL || checkM(matrix2) == 0){
-        free(matrix2);
-    }
-    
-    if (checkM(result) != 0 ){
-        freeMyStruct(result);
-    }
-    else if (result != NULL || checkM(result) == 0){
-        free(result);
-    }
-    free(ringInfo);
+    freeMyStruct(matrix1);
+    freeMyStruct(matrix2);
+    freeMyStruct(result);
     
     return 0;
 }
