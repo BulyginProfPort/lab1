@@ -9,12 +9,45 @@ struct Matrix{
     void* **a;
 };
 
+void* getNumTemp(int type,struct Matrix* matrix, int *x, double *y){
+    if (type == 1){
+        if (matrix->ringInfo->size == sizeof(int)){
+            x = malloc( matrix->rows * matrix->columns * sizeof(int) );
+            return x;
+        }
+        else if(matrix->ringInfo->size == sizeof(double)){
+            y = malloc( matrix->rows * matrix->columns * sizeof(double) );
+            return y;
+        }
+    }
+    if (type == 2){
+        if (matrix->ringInfo->size == sizeof(int)){
+            x = malloc( sizeof(int*) );
+            return x;
+        }
+        else if(matrix->ringInfo->size == sizeof(double)){
+            y = malloc(sizeof(double*) );
+            return y;
+        }
+    }
+    return 0;
+}
+
 struct Matrix* getMyStruct(struct Matrix* matrix){
     matrix = malloc(sizeof(struct Matrix));
     matrix->ringInfo = malloc(sizeof(struct RingInfo));
+    matrix->ringInfo->size = 0;
     matrix->ringInfo->det = NULL;
     matrix->a = NULL;
     return matrix;
+}
+void freeMyTemp(int* x, double* y){
+    if (x != NULL){
+        free(x);
+    }
+    if (y != NULL){
+        free(y);
+    }
 }
 void freeMyStruct(struct Matrix* matrix){
     if (matrix != NULL){
@@ -23,11 +56,13 @@ void freeMyStruct(struct Matrix* matrix){
                 free(matrix->a[i]);
             }
             free(matrix->a);
+            matrix->a = NULL;
         }
-        if (matrix->ringInfo != NULL){
-            free(matrix->ringInfo);
-        }
+        free(matrix->ringInfo);
+        matrix->ringInfo = NULL;
+
         free(matrix);
+        matrix = NULL;
     }
 }
 void freeMyMatrix(struct Matrix* matrix){
@@ -43,23 +78,17 @@ void freeMyMatrix(struct Matrix* matrix){
 
 // 1. Создание
 
-void Zeroes(struct Matrix* matrix){
-    int *x = NULL;
-    double *y = NULL;
+void Zeroes(struct Matrix* matrix, int* x,double* y){
     int m = 0;
-    selectedType(matrix);
-    choose_size(matrix);
     matrix->a = malloc ( matrix->rows * sizeof(int*));
 
     if(matrix->ringInfo->size == sizeof(int)){
-        x = malloc( (matrix->columns * matrix->rows) * sizeof(int) );
         for (int i  = 0; i < matrix->rows * matrix->columns; i++){
             x[i] = 0;
         }
     }
     
     if(matrix->ringInfo->size == sizeof(double)){
-        y = malloc( (matrix->columns * matrix->rows) * sizeof(double) );
         for (int i  = 0; i < matrix->rows * matrix->columns; i++){
             y[i] = 0.0;
         }
@@ -79,15 +108,10 @@ void Zeroes(struct Matrix* matrix){
     }
 }
 
-void Identity_Matrix(struct Matrix* matrix){
-    int *x = NULL;
-    double *y = NULL;
-    selectedType(matrix);
-    choose_size(matrix);
+void Identity_Matrix(struct Matrix* matrix, int* x, double* y){
     int m = (matrix->rows - 1);
 
     if (matrix->ringInfo->size == sizeof(int) ){
-        x = malloc( (matrix->columns * matrix->rows) * sizeof(int*) );
         for (int i = 0; i < (matrix->columns * matrix->rows); i++ ){
             if (i > m){
                 x[i] = 0;
@@ -99,7 +123,6 @@ void Identity_Matrix(struct Matrix* matrix){
     }
     
     if(matrix->ringInfo->size == sizeof(double)){
-        y = malloc( (matrix->columns * matrix->rows) * sizeof(double*) );
         for (int i = 0; i < (matrix->columns * matrix->rows); i++ ){
             if (i > m){
                 y[i] = 0.0;
@@ -138,26 +161,20 @@ void Identity_Matrix(struct Matrix* matrix){
     }
 }
 
-void AnyValue_Matrix(struct Matrix* matrix){
-    int* x = NULL;
-    double* y = NULL;
+void AnyValue_Matrix(struct Matrix* matrix, int* x, double *y){
     int m = 0;
-    selectedType(matrix);
-    choose_size(matrix);
-
+    
     matrix->a = malloc ( matrix->rows * sizeof(void*));
     
     printf("Введите число, из которого хотите создать матрицу.\n");
     
     if (matrix->ringInfo->size == sizeof(int) ){
-        x = malloc( matrix->columns * matrix->rows * sizeof(int));
         scanf("%d",&x[0]);
         for (int i = 1; i < matrix->columns * matrix->rows; i++){
             x[i] = x[i-1];
         }
     }
     else if (matrix->ringInfo->size == sizeof(double) ){
-        y = malloc(matrix->columns * matrix->rows * sizeof(double));
         scanf("%lf",&y[0]);
         for (int i = 1; i < matrix->columns * matrix->rows; i++){
             y[i] = y[i-1];
@@ -177,20 +194,8 @@ void AnyValue_Matrix(struct Matrix* matrix){
     }
 }
 
-void randvv(struct Matrix* matrix){
-    int* x = NULL;
-    double* y = NULL;
+void randvv(struct Matrix* matrix, int* x, double* y){
     int m = 0;
-    selectedType(matrix);
-    choose_size(matrix);
-
-    if (matrix->ringInfo->size == sizeof(int)){
-        x = malloc( matrix->rows * matrix->columns * sizeof(int) );
-    }
-    else if(matrix->ringInfo->size == sizeof(double)){
-        y = malloc( matrix->rows * matrix->columns * sizeof(double) );
-    }
-    
     matrix->a = malloc( matrix->rows * sizeof(void*));
     for ( int i = 0; i < matrix->columns; i++ ){
         matrix->a[i] = malloc( matrix->rows * sizeof(void*));
@@ -232,9 +237,7 @@ void GetLine(struct Matrix* result,struct Matrix* matrix, int num_rows){
     }
 }
 
-void transposedMatrix(struct Matrix *matrix){
-    void* temp;
-    temp = malloc(sizeof(void*));
+void transposedMatrix(struct Matrix *matrix, void* temp){
     for (int i = 0; i < matrix->rows; i++){
         for (int j = 0; j < i; j++){
             temp = matrix->a[i][j];
@@ -258,36 +261,42 @@ void getMinor(struct Matrix* matrix, struct Matrix* new_matrix, int line, int co
             new_matrix->a[i][j] = matrix->a[i+markerl][j+markercol];
         }
     }
-
 }
 
-void* getDet(struct Matrix* matrix, int* tempi, double* tempd){
+void* getDet(struct Matrix* matrix, int tempi, double tempd, void* *det){
     int sign = 1;
-    void* det = NULL;
-    det = malloc(sizeof(void*));
+    int ti = 0;
+    double td = 0.0;
+    void* *det1 = NULL;
     if (matrix->columns == matrix->rows){
+        
         if ( (matrix->rows < 1)){
             printf("Ошибка! Дана неправильная матрица. Попробуйте создать матрицу.\n");
         }
         
         else if (matrix->rows == 1){
-            det = matrix->a[0][0];
-            return (det);
+            *det = matrix->a[0][0];
+            return (*det);
         }
         
         else if (matrix->rows == 2){
+            
             if ( matrix->ringInfo->size == sizeof(int) ){
-                *tempi = ( (*(int*)matrix->a[0][0]) * (*(int*)matrix->a[1][1]) ) - ( (*(int*)matrix->a[0][1]) * (*(int*)matrix->a[1][0]) );
-                det = tempi;
+                tempi = ( (*(int*)matrix->a[0][0]) * (*(int*)matrix->a[1][1]) ) - ( (*(int*)matrix->a[0][1]) * (*(int*)matrix->a[1][0]) );
+                *det = &tempi;
             }
+            
             if ( matrix->ringInfo->size == sizeof(double) ){
-                *tempd = ( (*(double*)matrix->a[0][0]) * (*(double*)matrix->a[1][1]) ) - ( (*(double*)matrix->a[0][1]) * (*(double*)matrix->a[1][0]) );
-                det = tempd;
+                tempd = ( (*(double*)matrix->a[0][0]) * (*(double*)matrix->a[1][1]) ) - ( (*(double*)matrix->a[0][1]) * (*(double*)matrix->a[1][0]) );
+                *det = &tempd;
             }
-            return (det);
+            return (*det);
         }
         
         else if (matrix->rows > 2){
+            
+            det1 = malloc(sizeof(void*));
+            
             struct Matrix* newMatrix = NULL;
             newMatrix = getMyStruct(newMatrix);
             newMatrix->rows = matrix->rows - 1;
@@ -299,45 +308,33 @@ void* getDet(struct Matrix* matrix, int* tempi, double* tempd){
                 newMatrix->a[i] = malloc( newMatrix->rows * sizeof(void*) );
             }
             
-            for(int j = 0; j < matrix->rows; j++){
-                getMinor(matrix,newMatrix, 0, j);
+            for(int i = 0; i < matrix->rows; i++){
+                
+                getMinor(matrix,newMatrix, 0, i);
+                
                 if ( matrix->ringInfo->size == sizeof(int) ){
-                    *tempi = ( *(int*)det + ( (int)sign * (*(int*)matrix->a[0][j] ) *  (*(int*)getDet(newMatrix,tempi,tempd) ) ) );
-                    det = tempi;
-                }
-                if ( matrix->ringInfo->size == sizeof(double) ){
-                    *tempd = *(double*)det + ( (double)sign * *(double*)matrix->a[0][j] * *(double*)getDet(newMatrix,tempi,tempd) );
-                    det = tempd;
-                    
+
+                    tempi = **(int**)det +  (int)sign * (*(int*)matrix->a[0][i] ) *  (*(int*)getDet(newMatrix,ti,td, det1) );
+                    *det = &tempi;
                 }
                 
+                if ( matrix->ringInfo->size == sizeof(double) ){
+                    tempd = *(double*)det + ( (double)sign * *(double*)matrix->a[0][i] * (*(double*)getDet(newMatrix,ti,tempd, det1) ) );
+                    *det = &tempd;
+                }
                 sign = -sign;
             }
+            free(det1);
+            det1 = NULL;
             freeMyStruct(newMatrix);
         }
     }
-    if (matrix->ringInfo->size == sizeof(int)){
-        matrix->ringInfo->det = malloc (sizeof(int));
-        matrix->ringInfo->det = det;
-        printf("det = %d\n", *(int*)matrix->ringInfo->det);
-
-    }
-    else if (matrix->ringInfo->size == sizeof(double)){
-        matrix->ringInfo->det = malloc (sizeof(double));
-        matrix->ringInfo->det = det;
-        printf("det = %lf\n", *(double*)matrix->ringInfo->det);
-    }
-    
-    return det;
+    return (*det);
 }
 
-void inverseMatrix(struct Matrix *matrix, struct Matrix *result){
-    int sign = 1, m = 0;
-    int* ti = NULL;
-    double* td = NULL;
-    int* tempi = NULL;
-    double* tempd = NULL;
-    
+void inverseMatrix(struct Matrix *matrix, struct Matrix *result,int* ti,double* td, void* det, void* temp){
+    int sign = 1, m = 0, tempi = 0;
+    double tempd= 0.0;
     if (matrix->columns == matrix->rows){
         
         struct Matrix* newMatrix = malloc(sizeof(struct Matrix));
@@ -357,10 +354,6 @@ void inverseMatrix(struct Matrix *matrix, struct Matrix *result){
         result->rows = matrix->rows;
         result->columns = matrix->columns;
         
-        ti = malloc(result->rows * result->columns * sizeof(void*));
-        tempi = malloc(sizeof(void*));
-        tempd = malloc(sizeof(void*));
-
         for (int i = 0; i < matrix->rows; i++){
             result->a[i] = malloc(matrix->rows * sizeof(void*));
             for (int j = 0; j < matrix->columns; j++){
@@ -368,48 +361,58 @@ void inverseMatrix(struct Matrix *matrix, struct Matrix *result){
                 getMinor(matrix,newMatrix, i, j);
     
                 if  ( result->ringInfo->size == sizeof(int) ){
-                    ti[m] = (int)sign * *(int*)getDet(newMatrix,tempi,tempd);
+                    ti[m] = (int)sign * *(int*)getDet(newMatrix,tempi,tempd,det);
                     result->a[i][j] = &ti[m];
                 }
                 
                 if  (result->ringInfo->size == sizeof(double) ){
-                    td[m] = (double)sign * *(double*)getDet(newMatrix,tempi,tempd);
-                    *(double*)result->a[i][j] = (double)sign * *(double*)getDet(newMatrix,tempi,tempd);
+                    td[m] = (double)sign * *(double*)getDet(newMatrix,tempi,tempd,det);
+                    result->a[i][j] = &td[m];
                 }
                 sign = -sign;
                 m++;
             }
         }
-        transposedMatrix(result);
+        transposedMatrix(result, temp);
         freeMyStruct(newMatrix);
     }
 }
 
 
 // 3. Операции
-struct Matrix* Sum(struct Matrix* result,struct Matrix* matrix1, struct Matrix* matrix2){
-    int tempi;
-    double tempd;
+void Sum(struct Matrix* result,struct Matrix* matrix1, struct Matrix* matrix2, int* ti, double* td){
+    int m = 0;
+    printM(matrix1);
+    printM(matrix2);
     if(matrix1->ringInfo->size == matrix2->ringInfo->size){
+        
         if (matrix1->columns == matrix1->rows || matrix2->columns == matrix2->rows){
-            if (matrix1->rows == matrix2->rows){
-                for (int i = 0; i < matrix1->rows; i++){
-                    result->a[i] = malloc( matrix1->rows * sizeof(void*));
-                    for (int j=0; j < matrix1->columns; i++ ){
-                        if ( matrix1->ringInfo->size == sizeof(int) ){
-                            tempi = *(int*)matrix1->a[i][j] + *(int*)matrix2->a[i][j];
-                            result->a[i][j] = &tempi;
-                        }
-                        if (matrix1->ringInfo->size == sizeof(double)){
-                            tempd = *(double*)matrix1->a[i][j] + *(double*)matrix2->a[i][j];
-                            result->a[i][j] = &tempd;
-                        }
+            
+            result->a = malloc(matrix1->rows * sizeof(void*));
+            result->ringInfo = malloc(sizeof(struct RingInfo));
+            
+            result->ringInfo->size = matrix1->ringInfo->size;
+            
+            result->rows = matrix1->rows;
+            result->columns = matrix1->columns;
+            
+            for (int i = 0; i < result->rows; i++){
+                result->a[i] = malloc( result->columns * sizeof(void*));
+                for (int j = 0; j < result->columns; j++ ){
+                    
+                    if ( result->ringInfo->size == sizeof(int) ){
+                        ti[m] = *(int*)matrix1->a[i][j] + *(int*)matrix2->a[i][j];
+                        result->a[i][j] = &ti[m];
                     }
+                    if ( result->ringInfo->size == sizeof(double) ){
+                        td[m] = *(double*)matrix1->a[i][j] + *(double*)matrix2->a[i][j];
+                        result->a[i][j] = &td[m];
+                    }
+                    m++;
                 }
             }
         }
     }
-    return result;
 }
 
 void MultSc (void* scalar, struct Matrix* matrix){
@@ -426,29 +429,36 @@ void MultSc (void* scalar, struct Matrix* matrix){
 }
 
 
-struct Matrix* Mult(struct Matrix* result, struct Matrix* matrix1, struct Matrix* matrix2){
-    int tempi;
-    double tempd;
+void Mult(struct Matrix* result, struct Matrix* matrix1, struct Matrix* matrix2, int* tempi, double* tempd){
     if(matrix1->ringInfo->size == matrix2->ringInfo->size){
         if (matrix1->columns == matrix2->rows){
+            int m = 0;
+            result->a = malloc(matrix1->rows * sizeof(void*));
+            result->ringInfo = malloc(sizeof(struct RingInfo));
+            
+            result->ringInfo->size = matrix1->ringInfo->size;
+            
+            result->rows = matrix1->rows;
+            result->columns = matrix1->columns;
+            
             for (int i = 0; i < matrix1->rows; i++){
-                result->a[i] = malloc( matrix1->rows * sizeof(void*));
+                result->a[i] = malloc( result->columns * sizeof(void*) );
                 for (int j = 0; j < matrix1->columns; j++){
-                    if ( matrix1->ringInfo->size == sizeof(int) ){
-                        tempi = (*(int*)matrix1->a[i][j]) * (*(int*)matrix2->a[j][i]) ;
-                        tempi = *(int*)result->a[i][j] + tempi;
-                        result->a[i][j] = &tempi;
+                    for (int k = 0; k < matrix1->columns ; k++){
+                        if ( matrix1->ringInfo->size == sizeof(int) ){
+                            tempi[m] = (int)tempi[m] + (*(int*)matrix1->a[i][k]) * (*(int*)matrix2->a[k][j]);
+                            result->a[i][j] = &tempi[m];
+                        }
+                        if ( matrix1->ringInfo->size == sizeof(double) ){
+                            tempd[m] = (double)tempd[m] + (*(double*)matrix1->a[i][j]) * (*(double*)matrix2->a[i][j]);
+                            result->a[i][j] = &tempd;
+                        }
                     }
-                    if ( matrix1->ringInfo->size == sizeof(double) ){
-                        tempd = (*(double*)matrix1->a[i][j]) * (*(double*)matrix2->a[i][j]) ;
-                        tempd = *(double*)result->a[i][j] + tempd;
-                        result->a[i][j] = &tempd;
-                    }
+                    m++;
                 }
             }
         }
     }
-    return result;
 }
 
 struct Matrix* SumLinComb(int scalar, struct Matrix* matrix, int numLine){

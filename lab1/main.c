@@ -9,14 +9,23 @@
 
 int main(){
     srand(time(NULL));
-    int* tempi = NULL;
-    double* tempd  = NULL;
-    int selected = 0,chsc = 0, size = 0;
+
+    int* x1 = NULL;
+    double* y1 = NULL;
+    int* x2 = NULL;
+    double* y2 = NULL;
+    int* ti = NULL;
+    double* td = NULL;
+    
     void* scalar = NULL;
     void* det = NULL;
+    void* temp = NULL;
+
     struct Matrix* matrix1 = NULL;
     struct Matrix* matrix2 = NULL;
     struct Matrix* result = NULL;
+
+    int selected = 0,chsc = 0, size = 0, k = 0;
 
     matrix1 = getMyStruct(matrix1);
     result = getMyStruct(result);
@@ -38,35 +47,76 @@ A:  printf("1. Создать матрицу.\n"
             scanf("%d",&select1);
             while (select1 < 5){
                 if (select1 == 1){
+                    freeMyTemp(x1, y1);
+                    x1 = NULL;
+                    y1 = NULL;
                     freeMyMatrix(matrix1);
                     size = 0;
                     printName(matrix1);
-                    Zeroes(matrix1);
-                    
+                    k =  selectedType(matrix1);
+                    choose_size(matrix1);
+                    if ( k == 1 ){
+                        x1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    else if ( k == 2 ){
+                        y1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    Zeroes(matrix1,x1 ,y1);
                     printM(matrix1);
                     goto A;
                 }
                 if (select1 == 2){
+                    freeMyTemp(x1, y1);
+                    x1 = NULL;
+                    y1 = NULL;
                     freeMyMatrix(matrix1);
                     printName(matrix1);
-                    Identity_Matrix(matrix1);
-
+                    k =  selectedType(matrix1);
+                    choose_size(matrix1);
+                    if ( k == 1 ){
+                        x1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    else if ( k == 2 ){
+                        y1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    Identity_Matrix(matrix1,x1,y1);
                     printM(matrix1);
                     goto A;
                 }
                 if (select1 == 3){
+                    freeMyTemp(x1, y1);
+                    x1 = NULL;
+                    y1 = NULL;
                     freeMyMatrix(matrix1);
                     printName(matrix1);
-                    randvv(matrix1);
-                    
+                    k =  selectedType(matrix1);
+                    choose_size(matrix1);
+                    if ( k == 1 ){
+                        x1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    else if ( k == 2 ){
+                        y1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    randvv(matrix1,x1,y1);
                     printM(matrix1);
                     goto A;
                 }
                 if (select1 == 4){
+                    freeMyTemp(x1, y1);
+                    x1 = NULL;
+                    y1 = NULL;
                     freeMyMatrix(matrix1);
                     printName(matrix1);
-                    AnyValue_Matrix(matrix1);
                     
+                    k =  selectedType(matrix1);
+                    choose_size(matrix1);
+                    if ( k == 1 ){
+                        x1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    else if ( k == 2 ){
+                        y1 = getNumTemp(1,matrix1, x1, y1);
+                    }
+                    AnyValue_Matrix(matrix1,x1,y1);
                     printM(matrix1);
                     goto A;
                 }
@@ -92,12 +142,18 @@ A:  printf("1. Создать матрицу.\n"
                         printf("Ошибка! Дана пустая матрица. Попробуйте создать матрицу.\n");
                         goto A;
                     }
-                    
-                    det = malloc(sizeof(void*));
-                    tempd = malloc(sizeof(void*));
-                    tempi = malloc(sizeof(void*));
-                    
-                    getDet(matrix1,tempi,tempd);
+                    int tempi = 0;
+                    double tempd  = 0.0;
+                    if (selectedType(matrix1) == 1){
+                        det = malloc(sizeof(void*));
+                        det = getDet(matrix1,tempi,tempd,&det);
+                        printf("det = %d\n",*(int*)det);
+                    }
+                    else if(selectedType(matrix1) == 2){
+                        det = malloc(sizeof(void*));
+                        det = getDet(matrix1,tempi,tempd,&det);
+                        printf("det = %f\n",*(double*)det);
+                    }
                     goto A;
                 }
                 if (select2 == 2){
@@ -105,20 +161,42 @@ A:  printf("1. Создать матрицу.\n"
                         printf("Ошибка! Дана пустая матрица. Попробуйте создать матрицу.\n");
                         goto A;
                     }
-                    transposedMatrix(matrix1);
+                    temp = malloc(sizeof(void*));
+                    transposedMatrix(matrix1,temp);
                     printM(matrix1);
+                    free(temp);
                     goto A;
                 }
                 if (select2 == 3){
+                    
                     if ( checkM(matrix1) == 0 ){
                         printf("Ошибка! Дана пустая матрица. Попробуйте создать матрицу.\n");
                         goto A;
                     }
-                    inverseMatrix(matrix1, result);
+                    int* ti = NULL;
+                    double* td = NULL;
+                    void* temp = NULL;
+                    det = malloc(sizeof(void*));
+                    
+                    k = selectedType(matrix1);
+                    temp = getNumTemp(2, matrix1, temp, temp);
+                    
+                    if ( k == 1 ){
+                        ti = getNumTemp(1,matrix1, ti, td);
+                    }
+                    else if ( k == 2 ){
+                        td = getNumTemp(1,matrix1, ti, td);
+                    }
+                    
+                    inverseMatrix(matrix1, result,ti,td,det,temp);
                     printM(result);
+                    freeMyTemp(ti, td);
+                    free(temp);
+                    free(det);
                     goto A;
                 }
                 if (select2 == 4){
+                    
                     if ( checkM(matrix1) == 0 ){
                         printf("Ошибка! Дана пустая матрица. Попробуйте создать матрицу.\n");
                         goto A;
@@ -130,6 +208,7 @@ A:  printf("1. Создать матрицу.\n"
                         scanf("%d",&chsc);
                         getchar();
                     }
+                    
                     scalar = malloc(sizeof(void*));
                     
                     if (chsc == 1){
@@ -196,36 +275,122 @@ A:  printf("1. Создать матрицу.\n"
             goto A;
         }
         if (selected == 3){
-            int select3 = 0;
+            int select3 = 0 , select1 = 0;
+            if ( matrix2 == NULL){
+                matrix2 = getMyStruct(matrix2);
+                printf("Какую марицу вы хотите создать?\n"
+                    "1. Матрицу нулей.\n"
+                    "2. Еденичную матрицу.\n"
+                    "3. Матрицу из произвольных чисел.\n"
+                    "4. Матрицы из введённого числа.\n"
+                    "5. Exit.\n");
+                scanf("%d",&select1);
+                if (select1 == 1){
+                    size = 0;
+                    printName(matrix2);
+                    k = selectedType(matrix2);
+                    choose_size(matrix2);
+                    if ( k == 1 ){
+                        x2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    else if ( k == 2 ){
+                        y2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    Zeroes(matrix2,x2 ,y2);
+                    printM(matrix2);
+                }
+                if (select1 == 2){
+                    printName(matrix2);
+                    k =  selectedType(matrix2);
+                    choose_size(matrix2);
+                    if ( k == 1 ){
+                        x2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    else if ( k == 2 ){
+                        y2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    Identity_Matrix(matrix2,x2,y2);
+                    printM(matrix2);
+                }
+                if (select1 == 3){
+                    freeMyMatrix(matrix2);
+                    printName(matrix2);
+                    k =  selectedType(matrix2);
+                    choose_size(matrix2);
+                                        
+                    if ( k == 1 ){
+                        x2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    else if ( k == 2 ){
+                        y2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    randvv(matrix2,x2,y2);
+                }
+                if (select1 == 4){
+                    freeMyMatrix(matrix2);
+                    printName(matrix2);
+                    
+                    k =  selectedType(matrix2);
+                    choose_size(matrix2);
+                    if ( k == 1 ){
+                        x2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    else if ( k == 2 ){
+                        y2 = getNumTemp(1,matrix2, x2, y2);
+                    }
+                    AnyValue_Matrix(matrix2,x2,y2);
+                    printM(matrix2);
+                }
+            }
+            printM(matrix1);
+            printM(matrix2);
             if ( (checkM(matrix1) == 1) && (checkM(matrix2) == 1) ){
                 printf("Какую операцию вы хотите произвести?\n"
-                       "1. Сумма матриц.\n"
-                       "2. Произведение матриц.\n"
-                       "3. Exit.\n");
+                        "1. Сумма матриц.\n"
+                        "2. Произведение матриц.\n"
+                        "3. Exit.\n");
                 scanf("%d",&select3);
                 while (select3 < 3){
                     if (select3 == 1){
-                        Sum(result, matrix1, matrix2);
+                        freeMyStruct(result);
+                        result = getMyStruct(result);
+            
+                        if ( k == 1 ){
+                            ti = getNumTemp(1,matrix1, ti, td);
+                        }
+                        else if ( k == 2 ){
+                            td = getNumTemp(1,matrix1, ti, td);
+                        }
+                        Sum(result, matrix1, matrix2,ti,td);
                         printM(result);
+                        freeMyTemp(ti, td);
                         goto A;
                     }
                     if (select3 == 2){
-                        Mult(result, matrix1, matrix2);
+                        freeMyStruct(result);
+                        result = getMyStruct(result);
+                        
+                        if ( k == 1 ){
+                            ti = getNumTemp(1,matrix1, ti, td);
+                        }
+                        else if ( k == 2 ){
+                            td = getNumTemp(1,matrix1, ti, td);
+                        }
+                        Mult(result, matrix1, matrix2,ti,td);
                         printM(result);
+                        freeMyTemp(ti, td);
                         goto A;
                     }
                 }
-            }
-            else{
-                printf("Ошибка! 2 матрица не задана, задайте 2-ую матрицу.\n");
-                
                 goto A;
             }
         }
+        goto A;
     }
     freeMyStruct(matrix1);
     freeMyStruct(matrix2);
     freeMyStruct(result);
-    
+    freeMyTemp(x1, y1);
+    freeMyTemp(x2, y2);
     return 0;
 }

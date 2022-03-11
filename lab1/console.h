@@ -18,7 +18,6 @@ void printM(struct Matrix* m );
 int checkM(struct Matrix* matrix);
 int checkMultSc(int a, struct Matrix* matrix);
 int checkLinColNum(int type,int num, struct Matrix* matrix);
-void selectedType(struct Matrix* matrix);
-
+int selectedType(struct Matrix* matrix);
 
 #endif /* console_h */

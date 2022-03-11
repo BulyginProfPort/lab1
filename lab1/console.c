@@ -40,7 +40,7 @@ void printM(struct Matrix *matrix){
 }
 
 int checkM(struct Matrix *matrix){
-    if (matrix ==NULL){
+    if (matrix == NULL){
         return 0;
     }
     if (matrix->a == NULL){
@@ -77,8 +77,16 @@ int checkLinColNum(int type,int num, struct Matrix* matrix){
     }
     return 1;
 }
-void selectedType(struct Matrix* matrix){
-    int a;
+int selectedType(struct Matrix* matrix){
+    int a = 0;
+    if (matrix->ringInfo->size != 0){
+        if ( matrix->ringInfo->size == sizeof(int) ){
+            return 1;
+        }
+        if ( matrix->ringInfo->size == sizeof(double) ){
+            return 2;
+        }
+    }
     scanf("%d",&a);
     while (a > 2 || a < 1){
         printf("Введено некорректное значение, попробуйте ещё раз.\n");
@@ -87,8 +95,11 @@ void selectedType(struct Matrix* matrix){
     }
     if ( a == 1 ){
         matrix->ringInfo->size = sizeof(int);
+        return 1;
     }
     if ( a == 2 ){
         matrix->ringInfo->size = sizeof(double);
+        return 2;
     }
+    return 0;
 }
