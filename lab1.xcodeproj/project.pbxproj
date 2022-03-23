@@ -10,6 +10,7 @@
 		BE20744427BC32DD00342ECB /* Sq-Matrix.c in Sources */ = {isa = PBXBuildFile; fileRef = BE20744327BC32DD00342ECB /* Sq-Matrix.c */; };
 		BE20744527BC41C300342ECB /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = BEEC2FD927BBA89900B8C271 /* main.c */; };
 		BECD173E27BF9C2F0066B812 /* RingInfo.c in Sources */ = {isa = PBXBuildFile; fileRef = BECD173D27BF9C2F0066B812 /* RingInfo.c */; };
+		BEE073C927DBED55006352F4 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = BEE073C827DBED55006352F4 /* test.c */; };
 		BEEFF1EA27C17EA000A42AEB /* console.c in Sources */ = {isa = PBXBuildFile; fileRef = BEEFF1E927C17EA000A42AEB /* console.c */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,8 @@
 		BE20744327BC32DD00342ECB /* Sq-Matrix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "Sq-Matrix.c"; sourceTree = "<group>"; };
 		BECD173C27BF9C2F0066B812 /* RingInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RingInfo.h; sourceTree = "<group>"; };
 		BECD173D27BF9C2F0066B812 /* RingInfo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RingInfo.c; sourceTree = "<group>"; };
+		BEE073C727DBED55006352F4 /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
+		BEE073C827DBED55006352F4 /* test.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		BEEC2FD627BBA89900B8C271 /* lab1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lab1; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEEC2FD927BBA89900B8C271 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		BEEFF1E827C17EA000A42AEB /* console.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
@@ -73,6 +76,8 @@
 				BECD173D27BF9C2F0066B812 /* RingInfo.c */,
 				BEEFF1E827C17EA000A42AEB /* console.h */,
 				BEEFF1E927C17EA000A42AEB /* console.c */,
+				BEE073C727DBED55006352F4 /* test.h */,
+				BEE073C827DBED55006352F4 /* test.c */,
 			);
 			path = lab1;
 			sourceTree = "<group>";
@@ -104,7 +109,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1320;
+				LastUpgradeCheck = 1330;
 				TargetAttributes = {
 					BEEC2FD527BBA89900B8C271 = {
 						CreatedOnToolsVersion = 13.2.1;
@@ -134,6 +139,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEE073C927DBED55006352F4 /* test.c in Sources */,
 				BE20744527BC41C300342ECB /* main.c in Sources */,
 				BECD173E27BF9C2F0066B812 /* RingInfo.c in Sources */,
 				BEEFF1EA27C17EA000A42AEB /* console.c in Sources */,
@@ -258,6 +264,7 @@
 		BEEC2FDE27BBA89900B8C271 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -266,6 +273,7 @@
 		BEEC2FDF27BBA89900B8C271 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

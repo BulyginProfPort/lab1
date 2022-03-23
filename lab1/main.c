@@ -4,6 +4,7 @@
 #include "RingInfo.h"
 #include "console.h"
 #include <time.h>
+#include "test.h"
 
 #define printName(a)((printf("Какой тип чиселв в %s вы хотите использовать?\n1.Целочисленные.\n2.Вещественные.\n",#a)))
 
@@ -29,7 +30,56 @@ int main(){
 
     matrix1 = getMyStruct(matrix1);
     result = getMyStruct(result);
-
+    if (testMultInt() == 1){
+        printf("Тест 1.1 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 1.1' ошибка\n");
+    }
+    if (testMultDbl() == 1){
+        printf("Тест 1.2 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 1.2' ошибка\n");
+    }
+    
+    if (testMultScInt() == 1){
+        printf("Тест 2.1 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 2.1' ошибка\n");
+    }
+    if (testMultScDbl()== 1){
+        printf("Тест 2.2 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 2.2'ошибка\n");
+    }
+    if (testSumInt()== 1){
+        printf("Тест 3.1 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 3.1'ошибка\n");
+    }
+    if (testSumDbl()== 1){
+        printf("Тест 3.2 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 3.2'ошибка\n");
+    }
+    if (testGetMinorInt()== 1){
+        printf("Тест 4.1 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 4.1'ошибка\n");
+    }
+    if (testGetMinorDbl()== 1){
+        printf("Тест 4.2 успешно пройден\n");
+    }
+    else{
+        printf("В 'Тест 4.2'ошибка\n");
+    }
+    printf("\n");
 A:  printf("1. Создать матрицу.\n"
            "2. Операции над матрицой\n"
            "3. Операции над матрицами\n"
@@ -190,7 +240,12 @@ A:  printf("1. Создать матрицу.\n"
                     
                     inverseMatrix(matrix1, result,ti,td,det,temp);
                     printM(result);
-                    freeMyTemp(ti, td);
+                    if ( k == 1 ){
+                        ti = freeMyTemp(ti, td);
+                    }
+                    else if ( k == 2 ){
+                        td = freeMyTemp(ti, td);
+                    }
                     free(temp);
                     free(det);
                     goto A;
@@ -342,9 +397,9 @@ A:  printf("1. Создать матрицу.\n"
                     printM(matrix2);
                 }
             }
-            printM(matrix1);
-            printM(matrix2);
             if ( (checkM(matrix1) == 1) && (checkM(matrix2) == 1) ){
+                printM(matrix1);
+                printM(matrix2);
                 printf("Какую операцию вы хотите произвести?\n"
                         "1. Сумма матриц.\n"
                         "2. Произведение матриц.\n"
@@ -363,7 +418,12 @@ A:  printf("1. Создать матрицу.\n"
                         }
                         Sum(result, matrix1, matrix2,ti,td);
                         printM(result);
-                        freeMyTemp(ti, td);
+                        if ( k == 1 ){
+                            ti = freeMyTemp(ti, td);
+                        }
+                        else if ( k == 2 ){
+                            td = freeMyTemp(ti, td);
+                        }
                         goto A;
                     }
                     if (select3 == 2){
@@ -378,7 +438,12 @@ A:  printf("1. Создать матрицу.\n"
                         }
                         Mult(result, matrix1, matrix2,ti,td);
                         printM(result);
-                        freeMyTemp(ti, td);
+                        if ( k == 1 ){
+                            ti = freeMyTemp(ti, td);
+                        }
+                        else if ( k == 2 ){
+                            td = freeMyTemp(ti, td);
+                        }
                         goto A;
                     }
                 }
@@ -390,7 +455,17 @@ A:  printf("1. Создать матрицу.\n"
     freeMyStruct(matrix1);
     freeMyStruct(matrix2);
     freeMyStruct(result);
-    freeMyTemp(x1, y1);
-    freeMyTemp(x2, y2);
+    if ( k == 1 ){
+        x1 = freeMyTemp(x1, y1);
+    }
+    else if ( k == 2 ){
+        y1 = freeMyTemp(x1, y1);
+    }
+    if ( k == 1 ){
+        x2 = freeMyTemp(x2, y2);
+    }
+    else if ( k == 2 ){
+        y2 = freeMyTemp(x2, y2);
+    }
     return 0;
 }
